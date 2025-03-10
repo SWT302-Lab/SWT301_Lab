@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Account;
 
 /**
@@ -17,18 +19,19 @@ import model.Account;
  */
 public class AccountDAO extends DBContext {
 
+    private static final Logger LOGGER = Logger.getLogger(AccountDAO.class.getName());
     public String getAccount(String username, String password) {
         String sql = "SELECT role FROM Account WHERE username = ? AND password = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, username);
             st.setString(2, password);
-            ResultSet rs = st.executeQuery();
+            try (ResultSet rs = st.executeQuery()) {
             if (rs.next()) {
-                String role = rs.getString("role");
-                return role;
+                return rs.getString("role");
             }
+        }
         } catch (SQLException e) {
-            System.out.println(e);
+            LOGGER.log(Level.SEVERE, "Database error while fetching account role", e);
         }
         return null;
     }
