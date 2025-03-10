@@ -3,48 +3,45 @@
     <import file="nbproject/build-impl.xml"/>
 
     <!-- 🛠 Cấu hình JaCoCo -->
-    <property name="jacoco.agent" value="lib/jacocoagent.jar"/>
-    <property name="jacoco.execfile" value="build/jacoco.exec"/>
-    <property name="jacoco.reportdir" value="build/jacoco-report"/>
+    <property name="jacoco.agent" location="lib/org.jacoco.agent-0.8.8-runtime.jar"/>
+<property name="jacoco.destfile" location="build/jacoco.exec"/>
 
-    <!-- 🔹 Chạy test với coverage -->
-    <target name="test-with-coverage" depends="compile">
-        <mkdir dir="${jacoco.reportdir}"/>
-        
-        <junit printsummary="yes" fork="true">
-            <jvmarg value="-javaagent:${jacoco.agent}=destfile=${jacoco.execfile}"/>
-            <classpath>
-                <path refid="javac.classpath"/>
-                <pathelement path="build/classes"/>  <!-- NetBeans output -->
-                <pathelement path="build/test/classes"/> <!-- NetBeans test output -->
-            </classpath>
-            <batchtest>
-                <fileset dir="test">
-                    <include name="**/*Test.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
+<!-- Chạy test với JaCoCo -->
+<target name="test-with-coverage" depends="compile">
+    <mkdir dir="build/test-results"/>
+    <junit printsummary="yes" haltonfailure="no">
+        <classpath>
+            <pathelement location="build/classes"/>
+            <pathelement location="lib/junit.jar"/>
+            <pathelement location="lib/mockito-core.jar"/>
+        </classpath>
+        <sysproperty key="javaagent" value="${jacoco.agent}=destfile=${jacoco.destfile}"/>
+        <batchtest>
+            <fileset dir="test">
+                <include name="**/*Test.java"/>
+            </fileset>
+        </batchtest>
+        <formatter type="xml"/>
+    </junit>
+</target>
 
-    <!-- 🔹 Tạo báo cáo coverage -->
-    <target name="jacoco-report" depends="test-with-coverage">
-        <taskdef name="jacocoReport" classname="org.jacoco.ant.ReportTask">
-            <classpath path="lib/jacocoant.jar"/>
-        </taskdef>
+<!-- Tạo báo cáo JaCoCo -->
+<target name="jacoco-report">
+    <mkdir dir="build/jacoco-report"/>
+    <jacoco:report>
+        <executiondata>
+            <file file="${jacoco.destfile}"/>
+        </executiondata>
+        <structure name="MyProject">
+            <classfiles>
+                <fileset dir="build/classes"/>
+            </classfiles>
+            <sourcefiles>
+                <fileset dir="src"/>
+            </sourcefiles>
+        </structure>
+        <html destdir="build/jacoco-report"/>
+    </jacoco:report>
+</target>
 
-        <jacocoReport>
-            <executiondata>
-                <file file="${jacoco.execfile}"/>
-            </executiondata>
-            <structure name="MyProject">
-                <classfiles>
-                    <fileset dir="build/classes"/>
-                </classfiles>
-                <sourcefiles>
-                    <fileset dir="src"/>
-                </sourcefiles>
-            </structure>
-            <html destdir="${jacoco.reportdir}"/>
-        </jacocoReport>
-    </target>
 </project>
