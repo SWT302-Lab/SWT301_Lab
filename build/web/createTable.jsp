@@ -22,6 +22,10 @@
         <form action="addTable" method="post">
             <table>
                 <tr>
+                    <th>Label</th>
+                    <th>Input</th>
+                </tr>
+                <tr>
                     <td>Table ID:</td>
                     <td><input type="text" name="id" required/></td>
                 </tr>
