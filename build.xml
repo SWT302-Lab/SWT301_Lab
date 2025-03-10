@@ -68,4 +68,45 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <property name="jacoco.agent" value="lib/jacocoagent.jar"/>
+<property name="jacoco.execfile" value="${basedir}/jacoco.exec"/>
+<property name="jacoco.reportdir" value="${basedir}/jacoco-report"/>
+
+<target name="test-with-coverage" depends="compile">
+    <mkdir dir="${jacoco.reportdir}"/>
+    
+    <junit printsummary="yes" fork="true">
+        <jvmarg value="-javaagent:${jacoco.agent}=destfile=${jacoco.execfile}"/>
+        <classpath>
+            <path refid="classpath"/>
+        </classpath>
+        <batchtest>
+            <fileset dir="test">
+                <include name="**/*Test.java"/>
+            </fileset>
+        </batchtest>
+    </junit>
+</target>
+
+<target name="jacoco-report" depends="test-with-coverage">
+    <taskdef name="jacocoReport" classname="org.jacoco.ant.ReportTask">
+        <classpath path="lib/jacocoant.jar"/>
+    </taskdef>
+
+    <jacocoReport>
+        <executiondata>
+            <file file="${jacoco.execfile}"/>
+        </executiondata>
+        <structure name="MyProject">
+            <classfiles>
+                <fileset dir="bin"/>
+            </classfiles>
+            <sourcefiles>
+                <fileset dir="src"/>
+            </sourcefiles>
+        </structure>
+        <html destdir="${jacoco.reportdir}"/>
+    </jacocoReport>
+</target>
+
 </project>
